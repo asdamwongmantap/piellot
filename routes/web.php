@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminRequestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PicAccessController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\VehicleController;
@@ -41,6 +44,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('active')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+        Route::get('/jadwal', [ScheduleController::class, 'index'])->name('schedule.index');
+
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 
@@ -57,6 +62,9 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/tim', [TeamController::class, 'index'])->name('team.index');
             Route::post('/admin-requests', [AdminRequestController::class, 'store'])->name('admin-requests.store');
+
+            Route::get('/akun', [AccountController::class, 'show'])->name('account.show');
+            Route::put('/akun/password', [AccountController::class, 'updatePassword'])->name('account.password');
         });
 
         // Khusus Admin Fleet.
@@ -73,6 +81,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/bookings/{booking}/status', [BookingController::class, 'setStatus'])->name('bookings.status');
             Route::post('/invoices/{booking}', [InvoiceController::class, 'update'])->name('invoices.update');
             Route::post('/invoices/{booking}/paid', [InvoiceController::class, 'markPaid'])->name('invoices.paid');
+
+            Route::get('/akses-pic', [PicAccessController::class, 'index'])->name('access.index');
 
             Route::get('/export', [ExportController::class, 'download'])->name('export.download');
 
