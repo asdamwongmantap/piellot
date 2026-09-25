@@ -3,7 +3,7 @@ const props = defineProps({ status: { type: String, required: true } });
 
 const labels = {
   ACTIVE: 'Aktif', AVAILABLE: 'Tersedia', MAINTENANCE: 'Perawatan', PENDING: 'Menunggu',
-  APPROVED: 'Disetujui', CONFIRMED: 'Dikonfirmasi', COMPLETED: 'Selesai', REJECTED: 'Ditolak',
+  APPROVED: 'Disetujui', INVITED: 'Belum masuk', CONFIRMED: 'Dikonfirmasi', COMPLETED: 'Selesai', REJECTED: 'Ditolak',
 };
 
 const classesByStatus = {

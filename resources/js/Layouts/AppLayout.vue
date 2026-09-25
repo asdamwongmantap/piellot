@@ -10,16 +10,25 @@ const flashError = computed(() => page.props.flash?.error);
 
 const navItemsAdmin = [
   ['dashboard', 'Ringkasan'],
+  ['schedule.index', 'Jadwal'],
+  ['companies.pending', 'Approval'],
   ['bookings.index', 'Booking'],
+  ['vehicles.index', 'Armada'],
   ['invoices.index', 'Tagihan'],
   ['chat.index', 'Chat'],
+  ['access.index', 'Akses PIC'],
 ];
 const navItemsPic = [
   ['dashboard', 'Ringkasan'],
+  ['schedule.index', 'Jadwal'],
   ['bookings.index', 'Booking'],
   ['invoices.index', 'Tagihan'],
   ['chat.index', 'Chat'],
+  ['team.index', 'Admin PT'],
+  ['account.show', 'Akun'],
 ];
+const badges = computed(() => page.props.badges ?? {});
+const currentPattern = (routeName) => routeName === 'dashboard' ? routeName : routeName.replace(/\.[^.]+$/, '.*');
 
 const logout = () => router.post(route('logout'));
 </script>
@@ -40,18 +49,14 @@ const logout = () => router.post(route('logout'));
         <div class="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 text-sm">
           <Link v-for="[routeName, label] in (user.isAdmin ? navItemsAdmin : navItemsPic)" :key="routeName"
                 :href="route(routeName)"
-                class="whitespace-nowrap px-3 py-3"
-                :class="route().current(routeName) ? 'border-b-2 border-[#18b9ad] font-semibold text-white' : 'text-blue-100/70 hover:text-white'">
+                class="flex items-center gap-1.5 whitespace-nowrap px-3 py-3"
+                :class="route().current(currentPattern(routeName)) ? 'border-b-2 border-[#18b9ad] font-semibold text-white' : 'text-blue-100/70 hover:text-white'">
             {{ label }}
+            <span v-if="badges[routeName]" class="rounded-full bg-rose-600 px-1.5 text-[10px] font-bold leading-4 text-white">{{ badges[routeName] }}</span>
           </Link>
           <template v-if="user.isAdmin">
-            <Link :href="route('vehicles.index')" class="whitespace-nowrap px-3 py-3" :class="route().current('vehicles.*') ? 'border-b-2 border-[#18b9ad] font-semibold text-white' : 'text-blue-100/70 hover:text-white'">Armada</Link>
-            <Link :href="route('companies.pending')" class="whitespace-nowrap px-3 py-3" :class="route().current('companies.pending') ? 'border-b-2 border-[#18b9ad] font-semibold text-white' : 'text-blue-100/70 hover:text-white'">Approval</Link>
             <a :href="route('export.download')" class="whitespace-nowrap px-3 py-3 text-blue-100/70 hover:text-white">Export Excel</a>
             <Link :href="route('settings.index')" class="whitespace-nowrap px-3 py-3" :class="route().current('settings.*') ? 'border-b-2 border-[#18b9ad] font-semibold text-white' : 'text-blue-100/70 hover:text-white'">Pengaturan</Link>
-          </template>
-          <template v-else>
-            <Link :href="route('team.index')" class="whitespace-nowrap px-3 py-3" :class="route().current('team.*') ? 'border-b-2 border-[#18b9ad] font-semibold text-white' : 'text-blue-100/70 hover:text-white'">Admin PT</Link>
           </template>
         </div>
       </nav>
