@@ -29,6 +29,7 @@ const submit = () => form.post(route('login'));
       <label class="flex items-center gap-2 text-sm text-slate-600">
         <input v-model="form.remember" type="checkbox"> Ingat saya
       </label>
+      <div class="text-right text-sm"><Link :href="route('password.request')" class="font-semibold text-[#0c8f86]">Lupa kata sandi?</Link></div>
       <button :disabled="form.processing" class="w-full rounded-xl bg-[#0c8f86] px-4 py-2.5 font-bold text-white hover:bg-[#087e75] disabled:opacity-60">Masuk</button>
     </form>
     <p class="mt-4 text-center text-sm text-slate-500">Belum punya akun? <Link :href="route('register')" class="font-semibold text-[#0c8f86]">Daftar</Link></p>

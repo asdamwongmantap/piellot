@@ -82,6 +82,29 @@ class AuthController extends Controller
         return redirect()->route('dashboard');
     }
 
+    public function showForgotPassword()
+    {
+        return Inertia::render('Auth/ForgotPassword');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (! $user) {
+            return back()->withErrors(['email' => 'Email tidak terdaftar.'])->onlyInput('email');
+        }
+
+        $user->update(['password' => $validated['password']]);
+
+        return redirect()->route('login')->with('success', 'Kata sandi berhasil diperbarui. Silakan masuk.');
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();

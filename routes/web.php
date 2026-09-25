@@ -31,6 +31,8 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middl
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
 Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
+Route::get('/lupa-password', [AuthController::class, 'showForgotPassword'])->name('password.request')->middleware('guest');
+Route::post('/lupa-password', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware('auth')->group(function () {
