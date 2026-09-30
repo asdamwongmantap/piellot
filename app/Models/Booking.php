@@ -10,19 +10,6 @@ class Booking extends Model
 {
     use HasFactory;
 
-    /**
-     * Daftar paket sewa beserta label, jam operasional, dan tarif.
-     * Ini adalah terjemahan langsung dari `PACKAGES` pada source aslinya
-     * (app/piellot-app.tsx & app/api/action/route.ts).
-     */
-    public const PACKAGES = [
-        '4h' => ['label' => '4 Jam', 'window' => '08.00–12.00', 'rate' => 400_000],
-        '8h' => ['label' => '8 Jam', 'window' => '08.00–17.00', 'rate' => 650_000],
-        '24h' => ['label' => '24 Jam', 'window' => '08.00–08.00 (+1 hari)', 'rate' => 1_200_000],
-    ];
-
-    public const DRIVER_RATE = 200_000;
-
     protected $fillable = [
         'company_id', 'pic_name', 'vehicle_id', 'package_code', 'booking_date',
         'load_ton', 'destination', 'passengers', 'need_driver', 'status',
@@ -53,6 +40,6 @@ class Booking extends Model
 
     public function packageLabel(): string
     {
-        return self::PACKAGES[$this->package_code]['label'] ?? $this->package_code;
+        return RentalPackage::where('code', $this->package_code)->value('label') ?? $this->package_code;
     }
 }
