@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AppSetting;
 use App\Models\Booking;
+use App\Models\RentalPackage;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -32,10 +35,20 @@ class BookingController extends Controller
 
     public function create()
     {
+        $packages = RentalPackage::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->keyBy('code')
+            ->map(fn (RentalPackage $package) => [
+                'label' => $package->label,
+                'window' => $package->window_label,
+                'rate' => $package->rate,
+            ]);
+
         return Inertia::render('Bookings/Create', [
             'vehicles' => Vehicle::where('status', 'AVAILABLE')->orderBy('plate')->get(),
-            'packages' => Booking::PACKAGES,
-            'driverRate' => Booking::DRIVER_RATE,
+            'packages' => $packages,
+            'driverRate' => AppSetting::current()->driver_rate,
         ]);
     }
 
@@ -43,9 +56,11 @@ class BookingController extends Controller
     {
         $user = Auth::user();
 
+        $activePackages = RentalPackage::where('is_active', true)->pluck('rate', 'code');
+
         $validated = $request->validate([
             'vehicle_id' => ['required', 'exists:vehicles,id'],
-            'package_code' => ['required', 'in:4h,8h,24h'],
+            'package_code' => ['required', Rule::in($activePackages->keys())],
             'booking_date' => ['required', 'date', 'after_or_equal:today'],
             'load_ton' => ['required', 'numeric', 'min:0.1'],
             'destination' => ['required', 'string', 'max:160'],
@@ -75,8 +90,8 @@ class BookingController extends Controller
         }
 
         $needDriver = $request->boolean('need_driver');
-        $rentalFee = Booking::PACKAGES[$validated['package_code']]['rate'];
-        $driverFee = $needDriver ? Booking::DRIVER_RATE : 0;
+        $rentalFee = $activePackages[$validated['package_code']];
+        $driverFee = $needDriver ? AppSetting::current()->driver_rate : 0;
 
         Booking::create([
             'company_id' => $user->company_id,
