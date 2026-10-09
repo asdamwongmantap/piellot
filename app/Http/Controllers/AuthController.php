@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PasswordChanged;
 use App\Models\CompanyAdminRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
@@ -101,6 +104,12 @@ class AuthController extends Controller
         }
 
         $user->update(['password' => $validated['password']]);
+
+        try {
+            Mail::to($user->email)->send(new PasswordChanged($user, now()->translatedFormat('d F Y H:i')));
+        } catch (\Throwable $e) {
+            Log::warning('Gagal mengirim email konfirmasi ganti password: '.$e->getMessage());
+        }
 
         return redirect()->route('login')->with('success', 'Kata sandi berhasil diperbarui. Silakan masuk.');
     }
