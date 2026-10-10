@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class RentalPackage extends Model
 {
-    protected $fillable = ['code', 'label', 'window_label', 'rate', 'sort_order', 'is_active'];
+    protected $fillable = ['code', 'label', 'area', 'window_label', 'start_hour', 'duration_hours', 'rate', 'driver_rate', 'late_fee', 'tolerance_hours', 'sort_order', 'is_active'];
 
     protected $casts = [
+        'start_hour' => 'integer',
+        'duration_hours' => 'integer',
         'rate' => 'integer',
+        'driver_rate' => 'integer',
+        'late_fee' => 'integer',
+        'tolerance_hours' => 'integer',
         'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];
