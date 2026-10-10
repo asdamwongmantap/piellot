@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingCreated;
+use App\Mail\BookingStatusUpdated;
 use App\Models\Booking;
 use App\Models\RentalPackage;
+use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -98,8 +103,9 @@ class BookingController extends Controller
         $driverFee = $needDriver ? $package->driver_rate : 0;
         $tollFee = (int) ($validated['toll_fee'] ?? 0); // estimasi tol, cost to cost
 
-        Booking::create([
+        $booking = Booking::create([
             'company_id' => $user->company_id,
+            'user_id' => $user->id,
             'pic_name' => $user->name,
             'vehicle_id' => $vehicle->id,
             'package_code' => $validated['package_code'],
@@ -116,6 +122,8 @@ class BookingController extends Controller
             'total_fee' => $rentalFee + $driverFee + $tollFee,
             'paid' => false,
         ]);
+
+        $this->notifyAdmins($booking);
 
         return redirect()->route('bookings.index')->with('success', 'Booking berhasil dikirim.');
     }
@@ -141,8 +149,45 @@ class BookingController extends Controller
         }
 
         $booking->update(['status' => $validated['status']]);
+        $this->notifyRequester($booking);
 
         return back()->with('success', 'Status booking diperbarui.');
+    }
+
+    /** Email ke semua admin aktif; kegagalan kirim hanya dicatat di log. */
+    private function notifyAdmins(Booking $booking): void
+    {
+        $booking->load(['company', 'vehicle']);
+
+        User::where('role', 'ADMIN')->where('status', 'ACTIVE')->pluck('email')->each(function ($email) use ($booking) {
+            try {
+                Mail::to($email)->send(new BookingCreated($booking));
+            } catch (\Throwable $e) {
+                Log::warning("Gagal mengirim email booking baru ke {$email}: ".$e->getMessage());
+            }
+        });
+    }
+
+    /** Email ke pemesan: lewat user_id bila ada (> 0), jika tidak lewat pic_name. Gagal kirim diabaikan. */
+    private function notifyRequester(Booking $booking): void
+    {
+        $booking->load(['company', 'vehicle']);
+
+        if ($booking->user_id > 0) {
+            $recipients = User::where('id', $booking->user_id)->get();
+        } else {
+            $pics = User::where('role', 'PIC')->where('status', 'ACTIVE')->where('company_id', $booking->company_id)->get();
+            $recipients = $pics->where('name', $booking->pic_name);
+            $recipients = $recipients->isNotEmpty() ? $recipients : $pics;
+        }
+
+        foreach ($recipients as $recipient) {
+            try {
+                Mail::to($recipient->email)->send(new BookingStatusUpdated($booking, $recipient->name));
+            } catch (\Throwable $e) {
+                Log::warning("Gagal mengirim email status booking ke {$recipient->email}: ".$e->getMessage());
+            }
+        }
     }
 
     private function authorizeView(Booking $booking): void

@@ -5,7 +5,7 @@ import StatusBadge from './StatusBadge.vue';
 const props = defineProps({ booking: Object, isAdmin: Boolean });
 
 const rupiah = (value) => 'Rp ' + Number(value).toLocaleString('id-ID');
-const shortDate = (value) => new Date(`${value}T12:00:00`).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+const shortDate = (value) => new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 </script>
 
 <template>
