@@ -15,7 +15,7 @@ const shortDate = (value) => new Date(`${String(value).slice(0, 10)}T12:00:00`).
         <p class="truncate font-semibold text-slate-900">{{ isAdmin ? booking.company.name : booking.vehicle.plate }}</p>
         <p class="mt-1 text-sm text-slate-500">{{ isAdmin ? booking.vehicle.plate : booking.vehicle.type }} &middot; {{ booking.package_label }}</p>
       </div>
-      <StatusBadge :status="booking.status" />
+      <StatusBadge :status="booking.status" kind="booking" />
     </div>
     <div class="mt-4 grid gap-2 border-t border-dashed border-slate-200 pt-3 text-sm text-slate-600 sm:grid-cols-3">
       <span>{{ shortDate(booking.booking_date) }}</span>

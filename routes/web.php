@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('/invoices/{booking}', [InvoiceController::class, 'show'])->name('invoices.show');
+        Route::post('/invoices/{booking}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
 
         Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
         Route::post('/chat', [ChatController::class, 'send'])->name('chat.send');
@@ -82,7 +83,7 @@ Route::middleware('auth')->group(function () {
 
             Route::post('/bookings/{booking}/status', [BookingController::class, 'setStatus'])->name('bookings.status');
             Route::post('/invoices/{booking}', [InvoiceController::class, 'update'])->name('invoices.update');
-            Route::post('/invoices/{booking}/paid', [InvoiceController::class, 'markPaid'])->name('invoices.paid');
+            Route::post('/invoices/{booking}/payment-status', [InvoiceController::class, 'setPaymentStatus'])->name('invoices.payment-status');
 
             Route::get('/akses-pic', [PicAccessController::class, 'index'])->name('access.index');
 

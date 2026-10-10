@@ -35,7 +35,7 @@ const logout = () => router.post(route('logout'));
 
 <template>
   <div>
-    <header v-if="user" class="sticky top-0 z-40 bg-[#082b55] text-white shadow">
+    <header v-if="user" class="print:hidden sticky top-0 z-40 bg-[#082b55] text-white shadow">
       <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link :href="route('dashboard')" class="font-extrabold tracking-tight">
           PIELLOT <span class="text-xs font-normal text-blue-200">Fleet Booking</span>
@@ -63,8 +63,8 @@ const logout = () => router.post(route('logout'));
     </header>
 
     <main class="mx-auto max-w-6xl px-4 py-8">
-      <div v-if="flashSuccess" class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">{{ flashSuccess }}</div>
-      <div v-if="flashError" class="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800">{{ flashError }}</div>
+      <div v-if="flashSuccess" class="mb-6 print:hidden rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">{{ flashSuccess }}</div>
+      <div v-if="flashError" class="mb-6 print:hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800">{{ flashError }}</div>
       <slot />
     </main>
   </div>

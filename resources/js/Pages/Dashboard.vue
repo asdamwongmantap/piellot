@@ -12,7 +12,7 @@ const props = defineProps({
   isAdmin: Boolean,
   recentBookings: Array,
   pendingBookingsCount: Number,
-  confirmedBookingsCount: Number,
+  approvedBookingsCount: Number,
   totalBookingsCount: Number,
   vehiclesCount: Number,
   availableVehiclesCount: Number,
@@ -51,13 +51,13 @@ const pendingLink = computed(() => (props.pendingCompaniesCount + props.pendingA
       <template v-if="isAdmin">
         <Metric label="Total armada" :value="vehiclesCount" :note="`${availableVehiclesCount} tersedia`" />
         <Metric label="Booking menunggu" :value="pendingBookingsCount" />
-        <Metric label="Sedang aktif" :value="confirmedBookingsCount" />
+        <Metric label="Sedang aktif" :value="approvedBookingsCount" />
         <Metric label="Pendapatan lunas" :value="rupiah(paidRevenue)" />
       </template>
       <template v-else>
         <Metric label="Total booking" :value="totalBookingsCount" />
-        <Metric label="Menunggu" :value="pendingBookingsCount" />
-        <Metric label="Dikonfirmasi" :value="confirmedBookingsCount" />
+        <Metric label="Menunggu Approval" :value="pendingBookingsCount" />
+        <Metric label="Approved & On Going" :value="approvedBookingsCount" />
         <Metric label="Belum dibayar" :value="rupiah(unpaidTotal)" />
       </template>
     </section>

@@ -1,5 +1,5 @@
 <script setup>
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import StatusBadge from '../../Components/StatusBadge.vue';
@@ -26,7 +26,7 @@ const setStatus = (status) => {
         <p class="font-semibold text-slate-900">{{ booking.company.name }}</p>
         <p class="mt-1 text-sm text-slate-500">PIC: {{ booking.pic_name }}</p>
       </div>
-      <StatusBadge :status="booking.status" />
+      <StatusBadge :status="booking.status" kind="booking" />
     </div>
 
     <dl class="mt-6 grid gap-4 text-sm sm:grid-cols-2">
@@ -45,10 +45,19 @@ const setStatus = (status) => {
 
     <div v-if="isAdmin && booking.status === 'PENDING'" class="mt-5 flex gap-2">
       <button class="rounded-xl border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50" @click="setStatus('REJECTED')">Tolak</button>
-      <button class="rounded-xl bg-[#0c8f86] px-4 py-2 text-sm font-semibold text-white hover:bg-[#087e75]" @click="setStatus('CONFIRMED')">Konfirmasi</button>
+      <button class="rounded-xl bg-[#0c8f86] px-4 py-2 text-sm font-semibold text-white hover:bg-[#087e75]" @click="setStatus('APPROVED')">Approve</button>
     </div>
-    <div v-else-if="isAdmin && booking.status === 'CONFIRMED'" class="mt-5">
-      <button class="rounded-xl bg-[#0a2c58] px-4 py-2 text-sm font-semibold text-white hover:bg-[#123f73]" @click="setStatus('COMPLETED')">Tandai selesai</button>
+    <div v-else-if="isAdmin && ['APPROVED', 'CONFIRMED'].includes(booking.status)" class="mt-5">
+      <button class="rounded-xl bg-[#0c8f86] px-4 py-2 text-sm font-semibold text-white hover:bg-[#087e75]" @click="setStatus('ON_GOING')">Lanjut Proses</button>
+    </div>
+    <div v-else-if="isAdmin && booking.status === 'ON_GOING'" class="mt-5">
+      <button class="rounded-xl bg-[#0a2c58] px-4 py-2 text-sm font-semibold text-white hover:bg-[#123f73]" @click="setStatus('COMPLETED')">Tandai Selesai</button>
+    </div>
+    <div v-else-if="isAdmin && booking.status === 'COMPLETED'" class="mt-5">
+      <button class="rounded-xl bg-[#0c8f86] px-4 py-2 text-sm font-semibold text-white hover:bg-[#087e75]" @click="setStatus('INVOICING')">Lanjut Pembayaran</button>
+    </div>
+    <div v-else-if="['INVOICING', 'PAID'].includes(booking.status)" class="mt-5">
+      <Link :href="route('invoices.show', booking.id)" class="inline-block rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-50">Lihat Tagihan</Link>
     </div>
   </div>
 </template>

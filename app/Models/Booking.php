@@ -14,7 +14,7 @@ class Booking extends Model
     protected $fillable = [
         'company_id', 'user_id', 'pic_name', 'vehicle_id', 'package_code', 'booking_date', 'returned_at',
         'load_ton', 'destination', 'passengers', 'need_driver', 'status',
-        'rental_fee', 'driver_fee', 'toll_fee', 'late_fee', 'late_fee_adjusted', 'other_fee', 'total_fee', 'paid',
+        'rental_fee', 'driver_fee', 'toll_fee', 'late_fee', 'late_fee_adjusted', 'other_fee', 'total_fee', 'paid', 'payment_method', 'paid_at',
     ];
 
     protected $appends = ['package_label', 'package_window', 'due_at'];
@@ -25,6 +25,7 @@ class Booking extends Model
         'late_fee_adjusted' => 'boolean',
         'need_driver' => 'boolean',
         'paid' => 'boolean',
+        'paid_at' => 'datetime',
     ];
 
     public function company(): BelongsTo
