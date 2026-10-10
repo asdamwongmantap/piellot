@@ -10,7 +10,7 @@ const props = defineProps({ booking: Object });
 const isAdmin = usePage().props.auth.user.isAdmin;
 
 const rupiah = (value) => 'Rp ' + Number(value).toLocaleString('id-ID');
-const longDate = (value) => new Date(`${value}T12:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const longDate = (value) => new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 const setStatus = (status) => {
   if (status === 'REJECTED' && !confirm('Tolak booking ini?')) return;
