@@ -26,7 +26,7 @@ const shortDate = (value) => new Date(`${String(value).slice(0, 10)}T12:00:00`).
         <span class="mt-1 block text-sm text-slate-500">{{ shortDate(booking.booking_date) }} &middot; {{ packages[booking.package_code] }}</span>
         <strong class="mt-3 block text-sm text-[#0a2c58]">{{ rupiah(booking.total_fee) }}</strong>
       </span>
-      <StatusBadge :status="booking.paid ? 'ACTIVE' : 'PENDING'" />
+      <StatusBadge :status="booking.status" kind="booking" />
     </Link>
     <p v-if="!bookings.length" class="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-10 text-center text-slate-500 lg:col-span-2">Belum ada tagihan.</p>
   </div>

@@ -37,7 +37,7 @@ const cells = computed(() => {
   return [...Array(offset).fill(null), ...Array.from({ length: total }, (_, i) => {
     const key = dateKey(year.value, month.value, i + 1);
     const list = byDate.value[key] ?? [];
-    return { day: i + 1, key, booked: list.length > 0, confirmed: list.some((b) => b.status === 'CONFIRMED') };
+    return { day: i + 1, key, booked: list.length > 0, approved: list.some((b) => b.status !== 'PENDING') };
   })];
 });
 
@@ -89,13 +89,13 @@ const pick = (cell) => { selected.value = selected.value === cell.key ? null : c
                     @click="pick(cell)">
               {{ cell.day }}
               <i v-if="cell.booked" class="absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full"
-                 :class="cell.confirmed ? 'bg-[#0c8f86]' : 'bg-amber-500'" />
+                 :class="cell.approved ? 'bg-[#0c8f86]' : 'bg-amber-500'" />
             </button>
           </template>
         </div>
         <div class="mt-4 flex flex-wrap gap-4 border-t border-slate-100 pt-4 text-xs text-slate-500">
           <span class="flex items-center gap-2"><i class="size-2 rounded-full bg-amber-500" /> Ada booking</span>
-          <span class="flex items-center gap-2"><i class="size-2 rounded-full bg-[#0c8f86]" /> Dikonfirmasi</span>
+          <span class="flex items-center gap-2"><i class="size-2 rounded-full bg-[#0c8f86]" /> Approved</span>
         </div>
       </div>
     </div>
