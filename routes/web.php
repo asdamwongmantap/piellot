@@ -93,7 +93,6 @@ Route::middleware('auth')->group(function () {
             Route::post('/settings/packages', [SettingsController::class, 'storePackage'])->name('settings.packages.store');
             Route::put('/settings/packages/{rentalPackage}', [SettingsController::class, 'updatePackage'])->name('settings.packages.update');
             Route::delete('/settings/packages/{rentalPackage}', [SettingsController::class, 'destroyPackage'])->name('settings.packages.destroy');
-            Route::put('/settings/driver-rate', [SettingsController::class, 'updateDriverRate'])->name('settings.driver-rate.update');
         });
     });
 });

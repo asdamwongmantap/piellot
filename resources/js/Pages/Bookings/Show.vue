@@ -8,7 +8,6 @@ defineOptions({ layout: AppLayout });
 const props = defineProps({ booking: Object });
 
 const isAdmin = usePage().props.auth.user.isAdmin;
-const packages = { '4h': { label: '4 Jam', window: '08.00–12.00' }, '8h': { label: '8 Jam', window: '08.00–17.00' }, '24h': { label: '24 Jam', window: '08.00–08.00 (+1 hari)' } };
 
 const rupiah = (value) => 'Rp ' + Number(value).toLocaleString('id-ID');
 const longDate = (value) => new Date(`${value}T12:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -33,8 +32,9 @@ const setStatus = (status) => {
     <dl class="mt-6 grid gap-4 text-sm sm:grid-cols-2">
       <div><dt class="text-xs font-semibold uppercase text-slate-400">Armada</dt><dd class="mt-1 font-semibold text-slate-800">{{ booking.vehicle.plate }} &middot; {{ booking.vehicle.type }}</dd></div>
       <div><dt class="text-xs font-semibold uppercase text-slate-400">Jadwal</dt><dd class="mt-1 font-semibold text-slate-800">{{ longDate(booking.booking_date) }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase text-slate-400">Paket</dt><dd class="mt-1 font-semibold text-slate-800">{{ packages[booking.package_code].label }} &middot; {{ packages[booking.package_code].window }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase text-slate-400">Paket</dt><dd class="mt-1 font-semibold text-slate-800">{{ booking.package_label }} &middot; {{ booking.package_window }}</dd></div>
       <div><dt class="text-xs font-semibold uppercase text-slate-400">Muatan</dt><dd class="mt-1 font-semibold text-slate-800">{{ Number(booking.load_ton).toFixed(1) }} ton &middot; {{ booking.passengers }} kernet</dd></div>
+      <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-slate-400">Estimasi tol (cost to cost)</dt><dd class="mt-1 font-semibold text-slate-800">{{ rupiah(booking.toll_fee) }}</dd></div>
       <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-slate-400">Rute tujuan</dt><dd class="mt-1 font-semibold text-slate-800">{{ booking.destination }}</dd></div>
     </dl>
 

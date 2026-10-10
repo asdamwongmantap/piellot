@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AppSetting;
 use App\Models\Booking;
 use App\Models\RentalPackage;
 use App\Models\Vehicle;
@@ -41,14 +40,17 @@ class BookingController extends Controller
             ->keyBy('code')
             ->map(fn (RentalPackage $package) => [
                 'label' => $package->label,
+                'area' => $package->area,
                 'window' => $package->window_label,
                 'rate' => $package->rate,
+                'driverRate' => $package->driver_rate,
+                'lateFee' => $package->late_fee,
+                'toleranceHours' => $package->tolerance_hours,
             ]);
 
         return Inertia::render('Bookings/Create', [
             'vehicles' => Vehicle::where('status', 'AVAILABLE')->orderBy('plate')->get(),
             'packages' => $packages,
-            'driverRate' => AppSetting::current()->driver_rate,
         ]);
     }
 
@@ -56,7 +58,7 @@ class BookingController extends Controller
     {
         $user = Auth::user();
 
-        $activePackages = RentalPackage::where('is_active', true)->pluck('rate', 'code');
+        $activePackages = RentalPackage::where('is_active', true)->get()->keyBy('code');
 
         $validated = $request->validate([
             'vehicle_id' => ['required', 'exists:vehicles,id'],
@@ -66,6 +68,7 @@ class BookingController extends Controller
             'destination' => ['required', 'string', 'max:160'],
             'passengers' => ['required', 'integer', 'min:0', 'max:10'],
             'need_driver' => ['nullable', 'boolean'],
+            'toll_fee' => ['nullable', 'integer', 'min:0', 'max:100000000'],
         ]);
 
         $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
@@ -90,8 +93,10 @@ class BookingController extends Controller
         }
 
         $needDriver = $request->boolean('need_driver');
-        $rentalFee = $activePackages[$validated['package_code']];
-        $driverFee = $needDriver ? AppSetting::current()->driver_rate : 0;
+        $package = $activePackages[$validated['package_code']];
+        $rentalFee = $package->rate;
+        $driverFee = $needDriver ? $package->driver_rate : 0;
+        $tollFee = (int) ($validated['toll_fee'] ?? 0); // estimasi tol, cost to cost
 
         Booking::create([
             'company_id' => $user->company_id,
@@ -106,8 +111,9 @@ class BookingController extends Controller
             'status' => 'PENDING',
             'rental_fee' => $rentalFee,
             'driver_fee' => $driverFee,
+            'toll_fee' => $tollFee,
             'other_fee' => 0,
-            'total_fee' => $rentalFee + $driverFee,
+            'total_fee' => $rentalFee + $driverFee + $tollFee,
             'paid' => false,
         ]);
 

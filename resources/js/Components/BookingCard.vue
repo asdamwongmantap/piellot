@@ -4,10 +4,6 @@ import StatusBadge from './StatusBadge.vue';
 
 const props = defineProps({ booking: Object, isAdmin: Boolean });
 
-const packages = {
-  '4h': { label: '4 Jam' }, '8h': { label: '8 Jam' }, '24h': { label: '24 Jam' },
-};
-
 const rupiah = (value) => 'Rp ' + Number(value).toLocaleString('id-ID');
 const shortDate = (value) => new Date(`${value}T12:00:00`).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 </script>
@@ -17,7 +13,7 @@ const shortDate = (value) => new Date(`${value}T12:00:00`).toLocaleDateString('i
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <p class="truncate font-semibold text-slate-900">{{ isAdmin ? booking.company.name : booking.vehicle.plate }}</p>
-        <p class="mt-1 text-sm text-slate-500">{{ isAdmin ? booking.vehicle.plate : booking.vehicle.type }} &middot; {{ packages[booking.package_code].label }}</p>
+        <p class="mt-1 text-sm text-slate-500">{{ isAdmin ? booking.vehicle.plate : booking.vehicle.type }} &middot; {{ booking.package_label }}</p>
       </div>
       <StatusBadge :status="booking.status" />
     </div>

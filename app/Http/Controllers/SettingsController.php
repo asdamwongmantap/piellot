@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AppSetting;
 use App\Models\Booking;
 use App\Models\Company;
 use App\Models\CompanyAdminRequest;
@@ -15,7 +14,7 @@ use Inertia\Inertia;
 
 /**
  * Menggantikan action reset_transaction_data pada app/api/action/route.ts,
- * ditambah pengaturan paket durasi & tarif sewa driver yang sebelumnya
+ * ditambah pengaturan paket durasi (tarif sewa, tarif driver, denda) yang sebelumnya
  * berupa konstanta di App\Models\Booking.
  */
 class SettingsController extends Controller
@@ -31,7 +30,6 @@ class SettingsController extends Controller
                 'companyAdmins' => User::where('role', 'PIC')->count(),
             ],
             'packages' => RentalPackage::orderBy('sort_order')->get(),
-            'driverRate' => AppSetting::current()->driver_rate,
         ]);
     }
 
@@ -53,13 +51,25 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'code' => ['required', 'string', 'max:8', 'alpha_dash', 'unique:rental_packages,code'],
             'label' => ['required', 'string', 'max:60'],
+            'area' => ['required', 'in:CITY,OUTSIDE'],
             'window_label' => ['required', 'string', 'max:60'],
+            'start_hour' => ['required', 'integer', 'min:0', 'max:23'],
+            'duration_hours' => ['required', 'integer', 'min:1', 'max:72'],
             'rate' => ['required', 'integer', 'min:0'],
+            'driver_rate' => ['required', 'integer', 'min:0'],
+            'late_fee' => ['required', 'integer', 'min:0'],
+            'tolerance_hours' => ['required', 'integer', 'min:0', 'max:24'],
         ], [], [
             'code' => 'kode paket',
             'label' => 'nama paket',
+            'area' => 'area layanan',
             'window_label' => 'jam operasional',
+            'start_hour' => 'jam mulai',
+            'duration_hours' => 'durasi',
             'rate' => 'tarif',
+            'driver_rate' => 'tarif driver',
+            'late_fee' => 'denda keterlambatan',
+            'tolerance_hours' => 'toleransi',
         ]);
 
         RentalPackage::create($validated + [
@@ -74,13 +84,20 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'label' => ['required', 'string', 'max:60'],
+            'area' => ['required', 'in:CITY,OUTSIDE'],
             'window_label' => ['required', 'string', 'max:60'],
             'rate' => ['required', 'integer', 'min:0'],
             'is_active' => ['required', 'boolean'],
         ], [], [
             'label' => 'nama paket',
+            'area' => 'area layanan',
             'window_label' => 'jam operasional',
+            'start_hour' => 'jam mulai',
+            'duration_hours' => 'durasi',
             'rate' => 'tarif',
+            'driver_rate' => 'tarif driver',
+            'late_fee' => 'denda keterlambatan',
+            'tolerance_hours' => 'toleransi',
         ]);
 
         $rentalPackage->update($validated);
@@ -97,16 +114,5 @@ class SettingsController extends Controller
         $rentalPackage->delete();
 
         return back()->with('success', 'Paket durasi dihapus.');
-    }
-
-    public function updateDriverRate(Request $request)
-    {
-        $validated = $request->validate([
-            'driver_rate' => ['required', 'integer', 'min:0'],
-        ], [], ['driver_rate' => 'tarif sewa driver']);
-
-        AppSetting::current()->update($validated);
-
-        return back()->with('success', 'Tarif sewa driver berhasil diperbarui.');
     }
 }

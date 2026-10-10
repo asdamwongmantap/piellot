@@ -117,13 +117,13 @@ class ExportController extends Controller
             $b->id, $b->company?->name, $b->pic_name, $b->vehicle?->plate, $b->vehicle?->type,
             $b->packageLabel(), $b->booking_date->format('d M Y'), (float) $b->load_ton, $b->destination,
             $b->passengers, $b->need_driver ? 'Ya' : 'Tidak', $this->label($b->status),
-            $b->rental_fee, $b->driver_fee, $b->other_fee, $b->total_fee, $b->paid ? 'Lunas' : 'Belum lunas',
+            $b->rental_fee, $b->driver_fee, $b->toll_fee, $b->late_fee, $b->other_fee, $b->total_fee, $b->paid ? 'Lunas' : 'Belum lunas',
             $b->created_at->format('d M Y H:i'),
         ])->all();
 
         $this->writeSheet($spreadsheet, 'Booking & Tagihan', [
             'ID', 'Perusahaan', 'PIC', 'Plat', 'Tipe Armada', 'Paket', 'Tanggal', 'Muatan (ton)',
-            'Tujuan', 'Kernet', 'Driver', 'Status', 'Biaya Sewa', 'Biaya Driver', 'Biaya Lain',
+            'Tujuan', 'Kernet', 'Driver', 'Status', 'Biaya Sewa', 'Biaya Driver', 'Biaya Tol', 'Denda Telat', 'Biaya Lain',
             'Total Tagihan', 'Pembayaran', 'Dibuat',
         ], $rows);
     }
