@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -12,9 +13,12 @@ const isAdmin = usePage().props.auth.user.isAdmin;
 const rupiah = (value) => 'Rp ' + Number(value).toLocaleString('id-ID');
 const longDate = (value) => new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
+const busy = ref(false);
 const setStatus = (status) => {
   if (status === 'REJECTED' && !confirm('Tolak booking ini?')) return;
-  router.post(route('bookings.status', props.booking.id), { status });
+  if (busy.value) return;
+  busy.value = true;
+  router.post(route('bookings.status', props.booking.id), { status }, { onFinish: () => { busy.value = false; } });
 };
 </script>
 
@@ -33,7 +37,7 @@ const setStatus = (status) => {
       <div><dt class="text-xs font-semibold uppercase text-slate-400">Armada</dt><dd class="mt-1 font-semibold text-slate-800">{{ booking.vehicle.plate }} &middot; {{ booking.vehicle.type }}</dd></div>
       <div><dt class="text-xs font-semibold uppercase text-slate-400">Jadwal</dt><dd class="mt-1 font-semibold text-slate-800">{{ longDate(booking.booking_date) }}</dd></div>
       <div><dt class="text-xs font-semibold uppercase text-slate-400">Paket</dt><dd class="mt-1 font-semibold text-slate-800">{{ booking.package_label }} &middot; {{ booking.package_window }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase text-slate-400">Muatan</dt><dd class="mt-1 font-semibold text-slate-800">{{ Number(booking.load_ton).toFixed(1) }} ton &middot; {{ booking.passengers }} kernet</dd></div>
+      <div><dt class="text-xs font-semibold uppercase text-slate-400">Muatan</dt><dd class="mt-1 font-semibold text-slate-800">{{ Number(booking.load_ton).toFixed(1) }} ton &middot; {{ booking.passengers }} pendamping</dd></div>
       <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-slate-400">Estimasi tol (cost to cost)</dt><dd class="mt-1 font-semibold text-slate-800">{{ rupiah(booking.toll_fee) }}</dd></div>
       <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-slate-400">Rute tujuan</dt><dd class="mt-1 font-semibold text-slate-800">{{ booking.destination }}</dd></div>
     </dl>
