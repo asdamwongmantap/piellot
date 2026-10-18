@@ -72,7 +72,6 @@ class BookingController extends Controller
             'load_ton' => ['required', 'numeric', 'min:0.1'],
             'destination' => ['required', 'string', 'max:160'],
             'passengers' => ['required', 'integer', 'min:0', 'max:10'],
-            'need_driver' => ['nullable', 'boolean'],
             'toll_fee' => ['nullable', 'integer', 'min:0', 'max:100000000'],
         ]);
 
@@ -97,10 +96,10 @@ class BookingController extends Controller
             throw ValidationException::withMessages(['booking_date' => 'Armada sudah dibooking pada tanggal tersebut.']);
         }
 
-        $needDriver = $request->boolean('need_driver');
+        $needDriver = true; // driver sudah termasuk dalam tarif
         $package = $activePackages[$validated['package_code']];
         $rentalFee = $package->rate;
-        $driverFee = $needDriver ? $package->driver_rate : 0;
+        $driverFee = $package->driver_rate;
         $tollFee = (int) ($validated['toll_fee'] ?? 0); // estimasi tol, cost to cost
 
         $booking = Booking::create([
@@ -148,6 +147,13 @@ class BookingController extends Controller
     public function setStatus(Request $request, Booking $booking)
     {
         $validated = $request->validate(['status' => ['required', 'in:APPROVED,REJECTED,ON_GOING,COMPLETED,INVOICING']]);
+
+        // Status sudah di tujuan (klik ganda / halaman basi): bukan error, cukup arahkan seperti biasa.
+        if ($booking->status === $validated['status']) {
+            return $validated['status'] === 'INVOICING'
+                ? redirect()->route('invoices.show', $booking)
+                : back();
+        }
 
         if (! in_array($validated['status'], self::TRANSITIONS[$booking->status] ?? [], true)) {
             return back()->with('error', 'Perubahan status booking tersebut tidak diperbolehkan.');

@@ -15,7 +15,7 @@ const form = useForm({
   load_ton: '',
   destination: '',
   passengers: 1,
-  need_driver: false,
+  need_driver: true,
   toll_fee: 0,
 });
 
@@ -23,7 +23,7 @@ const areas = [{ key: 'CITY', title: 'Sewa Dalam Kota' }, { key: 'OUTSIDE', titl
 const packagesByArea = (area) => Object.entries(props.packages).filter(([, item]) => item.area === area);
 
 const selected = computed(() => props.packages[form.package_code]);
-const total = computed(() => (selected.value?.rate ?? 0) + (form.need_driver ? selected.value?.driverRate ?? 0 : 0) + Number(form.toll_fee || 0));
+const total = computed(() => (selected.value?.rate ?? 0) + (selected.value?.driverRate ?? 0) + Number(form.toll_fee || 0));
 
 const submit = () => form.post(route('bookings.store'));
 const rupiah = (value) => 'Rp ' + Number(value).toLocaleString('id-ID');
@@ -56,7 +56,8 @@ const todayIso = new Date().toISOString().slice(0, 10);
             <span>
               <span class="block text-sm font-bold text-slate-800">{{ item.label }}</span>
               <span class="mt-0.5 block text-xs text-slate-500">{{ item.window }}</span>
-              <span class="mt-1 block text-xs font-bold text-[#0c8f86]">{{ rupiah(item.rate) }}</span>
+              <span class="mt-1 block text-xs font-bold text-[#0c8f86]">{{ rupiah(item.rate + item.driverRate) }}</span>
+              <span class="mt-0.5 block text-xs text-slate-500">Sewa driver {{ rupiah(item.driverRate) }} (termasuk)</span>
               <span class="mt-0.5 block text-xs text-slate-500">Denda telat {{ rupiah(item.lateFee) }}/jam<template v-if="item.toleranceHours"> (toleransi {{ item.toleranceHours }} jam)</template></span>
             </span>
           </label>
@@ -82,18 +83,9 @@ const todayIso = new Date().toISOString().slice(0, 10);
         <input v-model="form.destination" type="text" required maxlength="160" placeholder="Cikarang – Bekasi" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2">
       </div>
 
-      <div class="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label class="block text-sm font-medium text-slate-700">Jumlah kernet</label>
-          <input v-model.number="form.passengers" type="number" min="0" max="10" required class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2">
-        </div>
-        <div class="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-2">
-          <div>
-            <label class="text-sm font-medium text-slate-700">Sewa driver</label>
-            <p class="text-xs text-slate-500">Tambah {{ rupiah(selected?.driverRate ?? 0) }}</p>
-          </div>
-          <input v-model="form.need_driver" type="checkbox" class="size-5">
-        </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Jumlah pendamping</label>
+        <input v-model.number="form.passengers" type="number" min="0" max="10" required class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2">
       </div>
 
       <div>

@@ -29,7 +29,7 @@ const canEditFees = computed(() => props.booking.status !== 'PAID');
 const invoiceNo = computed(() => 'INV-' + String(props.booking.id).padStart(5, '0'));
 const methodLabel = computed(() => props.paymentMethods[props.booking.payment_method] ?? null);
 const pay = (method) => router.post(route('invoices.pay', props.booking.id), { payment_method: method }, { onSuccess: () => { showMethods.value = false; } });
-const setPaid = (paid) => router.post(route('invoices.payment-status', props.booking.id), { paid });
+const setPaid = (paid) => router.post(route('invoices.payment-status', props.booking.id), { paid }, { preserveScroll: true });
 const printInvoice = () => window.print();
 </script>
 

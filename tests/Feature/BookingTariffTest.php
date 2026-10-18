@@ -45,6 +45,11 @@ class BookingTariffTest extends TestCase
         $this->assertSame(885_000, $booking->total_fee);
     }
 
+    public function test_driver_is_always_included_even_if_not_requested(): void
+    {
+        $this->assertSame(75_000, $this->book('4h', false, 0)->driver_fee);
+    }
+
     public function test_driver_rate_follows_package(): void
     {
         $this->assertSame(150_000, $this->book('8h', true, 0)->driver_fee);
@@ -68,7 +73,7 @@ class BookingTariffTest extends TestCase
 
         $this->adminUpdate($booking->fresh(), ['returned_at' => $due->copy()->addHours(3)->format('Y-m-d\TH:i')]);
         $this->assertSame(100_000, $booking->fresh()->late_fee); // 3 jam - 1 jam toleransi = 2 jam
-        $this->assertSame(600_000, $booking->fresh()->total_fee);
+        $this->assertSame(900_000, $booking->fresh()->total_fee); // sewa 500rb + driver 300rb + denda 100rb
 
         $this->adminUpdate($booking->fresh(), ['returned_at' => $due->copy()->addHours(3)->format('Y-m-d\TH:i'), 'late_fee' => 25_000]);
         $this->assertSame(25_000, $booking->fresh()->late_fee);
@@ -85,5 +90,21 @@ class BookingTariffTest extends TestCase
         $this->adminUpdate($booking, ['returned_at' => $booking->dueAt()->addMinutes(10)->format('Y-m-d\TH:i')]);
 
         $this->assertSame(50_000, $booking->fresh()->late_fee);
+    }
+
+    public function test_repeated_status_and_payment_requests_are_not_errors(): void
+    {
+        $booking = $this->book('4h', false, 0);
+        $admin = User::factory()->create(['role' => 'ADMIN', 'status' => 'ACTIVE']);
+
+        foreach (['APPROVED', 'ON_GOING', 'COMPLETED', 'INVOICING', 'INVOICING'] as $status) {
+            $this->actingAs($admin)->post("/bookings/{$booking->id}/status", ['status' => $status])->assertSessionMissing('error');
+        }
+
+        foreach ([true, true] as $paid) {
+            $this->actingAs($admin)->post("/invoices/{$booking->id}/payment-status", ['paid' => $paid])->assertSessionMissing('error');
+        }
+
+        $this->assertSame('PAID', $booking->fresh()->status);
     }
 }

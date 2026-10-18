@@ -107,6 +107,10 @@ class InvoiceController extends Controller
 
         $paid = (bool) $validated['paid'];
 
+        if ($booking->paid === $paid) {
+            return back(); // sudah sesuai, tidak ada yang diubah
+        }
+
         $booking->update([
             'paid' => $paid,
             'paid_at' => $paid ? now() : null,

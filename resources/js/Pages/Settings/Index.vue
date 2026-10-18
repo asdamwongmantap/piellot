@@ -31,8 +31,8 @@ const fieldDefs = [
   { key: 'window_label', label: 'Jam operasional', hint: 'Teks keterangan, contoh: 08.00–12.00', type: 'text' },
   { key: 'start_hour', label: 'Jam mulai', hint: 'Jam 0–23, awal sewa dihitung', type: 'number', min: 0, max: 23 },
   { key: 'duration_hours', label: 'Durasi hingga kembali (jam)', hint: 'Batas kembali = jam mulai + durasi', type: 'number', min: 1, max: 72 },
-  { key: 'rate', label: 'Tarif sewa (Rp)', hint: 'Harga paket tanpa driver', type: 'number', min: 0, step: 1000 },
-  { key: 'driver_rate', label: 'Tarif driver (Rp)', hint: 'Ditambahkan jika PIC menyewa driver', type: 'number', min: 0, step: 1000 },
+  { key: 'rate', label: 'Tarif sewa (Rp)', hint: 'Harga paket (belum termasuk driver)', type: 'number', min: 0, step: 1000 },
+  { key: 'driver_rate', label: 'Tarif driver (Rp)', hint: 'Otomatis termasuk dalam tarif yang tampil ke PIC', type: 'number', min: 0, step: 1000 },
   { key: 'late_fee', label: 'Denda telat (Rp/jam)', hint: 'Per jam keterlambatan, dibulatkan ke atas', type: 'number', min: 0, step: 1000 },
   { key: 'tolerance_hours', label: 'Toleransi (jam)', hint: 'Telat dalam batas ini tidak didenda', type: 'number', min: 0, max: 24 },
 ];
